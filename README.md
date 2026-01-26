@@ -542,8 +542,6 @@ Contributions are welcome! Please follow these steps:
 
 ---
 
-## 🎓 Learning Outcomes
-
 
 
 
