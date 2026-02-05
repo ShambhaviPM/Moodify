@@ -495,44 +495,6 @@ authMiddleware → Verifies JWT → Grants/Denies Access
 
 ---
 
-## 🚧 Future Enhancements
-
-### **Phase 1: API Integrations**
-- [ ] Spotify Web API for dynamic playlist recommendations
-- [ ] YouTube Data API for real-time video suggestions
-- [ ] Netflix API integration for movie recommendations
-- [ ] Podcast API (Apple Podcasts, Spotify Podcasts)
-
-### **Phase 2: Enhanced Features**
-- [ ] Mood history tracking with analytics dashboard
-- [ ] User preference learning via machine learning
-- [ ] Content rating and feedback system
-- [ ] Social sharing capabilities
-- [ ] Personalized avatars and profiles
-
-### **Phase 3: User Experience**
-- [ ] Dark/Light theme toggle
-- [ ] Achievement badges and gamification
-- [ ] Mobile app (React Native)
-- [ ] Progressive Web App (PWA) features
-- [ ] Offline mode support
-
-### **Phase 4: Technical Improvements**
-- [ ] Redis caching for faster response times
-- [ ] GraphQL implementation
-- [ ] Microservices architecture
-- [ ] Docker containerization
-- [ ] CI/CD pipeline (GitHub Actions)
-- [ ] Kubernetes orchestration
-
-### **Phase 5: Security & Compliance**
-- [ ] OAuth 2.0 social login (Google, Facebook)
-- [ ] Two-factor authentication (2FA)
-- [ ] GDPR compliance features
-- [ ] Rate limiting on API endpoints
-- [ ] Security audit and penetration testing
-
----
 
 ## 🤝 Contributing
 
@@ -562,58 +524,8 @@ Contributions are welcome! Please follow these steps:
 
 ---
 
-## 📄 License
 
-This project is licensed under the **MIT License**.
 
-```
-MIT License
-
-Copyright (c) 2024 Moodify
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-```
-
----
-
-## 📞 Contact & Support
-
-**Project Repository:** [GitHub Link]
-
-**Issues & Bugs:** Please report via GitHub Issues
-
-**Developer:** Your Name
-- Email: your.email@example.com
-- LinkedIn: [Your LinkedIn Profile]
-- Portfolio: [Your Portfolio Website]
-
----
-
-## 🙏 Acknowledgments
-
-- **Create React App** for the React boilerplate
-- **MongoDB** for the flexible database solution
-- **Express.js** community for excellent documentation
-- **React Router** for seamless navigation
-- Inspiration from mood-tracking and recommendation platforms
-
----
 
 ## 📊 Project Statistics
 
@@ -630,40 +542,12 @@ SOFTWARE.
 
 ---
 
-## 🎓 Learning Outcomes
 
-This project demonstrates proficiency in:
 
-✅ Full-stack development (MERN stack)
-✅ RESTful API design and implementation
-✅ Authentication & authorization (JWT, bcrypt)
-✅ Database design and modeling (MongoDB, Mongoose)
-✅ Client-side routing (React Router)
-✅ State management (localStorage, React hooks)
-✅ Algorithm design (recommendation engine)
-✅ Security best practices
-✅ Error handling and fallback mechanisms
-✅ Responsive UI/UX design
-✅ Component-based architecture
-✅ Modern JavaScript (ES6+)
-
----
-
-## 🎨 Design Philosophy
-
-Moodify follows these core principles:
-
-1. **User-Centric Design** - Every feature serves the user's emotional journey
-2. **Simplicity** - Clean, intuitive interface with minimal cognitive load
-3. **Personalization** - Recommendations tailored to individual preferences
-4. **Security First** - User data protection at every layer
-5. **Extensibility** - Architecture designed for future enhancements
-
----
 
 <div align="center">
 
-**Made with ❤️ and ☕ by [Your Name]**
+**Made with ❤️ and ☕ by Shambhavi PM and Shreeya S Methuku**
 
 ⭐ Star this repo if you found it helpful!
 
