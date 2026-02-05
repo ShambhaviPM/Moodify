@@ -29,7 +29,9 @@ mongoose
 app.use(cors({
   origin: [
     'http://localhost:3000',  // React frontend
-    'http://127.0.0.1:3000'   // Alternative localhost address
+    'http://localhost:3001',  // React frontend (alternate port)
+    'http://127.0.0.1:3000',  // Alternative localhost address
+    'http://127.0.0.1:3001'   // Alternative localhost address (alternate port)
   ],
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization']

@@ -1,0 +1,555 @@
+/* ========================================
+   MOODIFY CYBERPUNK THEME
+   Subtle neon with purple/blue palette
+   ======================================== */
+
+/* ===== CSS Variables ===== */
+:root {
+  --cyber-bg-dark: #0f172a;
+  --cyber-bg-medium: #1e293b;
+  --cyber-bg-light: #1a1a2e;
+  --cyber-bg-accent: #16213e;
+
+  --cyber-purple: #a855f7;
+  --cyber-blue: #3b82f6;
+  --cyber-pink: #ec4899;
+
+  --cyber-text: #ffffff;
+  --cyber-text-muted: #9ca3af;
+  --cyber-text-dim: #64748b;
+
+  --cyber-glow-purple: 0 0 20px rgba(168, 85, 247, 0.5);
+  --cyber-glow-blue: 0 0 20px rgba(59, 130, 246, 0.5);
+  --cyber-glow-intense: 0 0 40px rgba(168, 85, 247, 0.7), 0 0 80px rgba(168, 85, 247, 0.3);
+
+  --cyber-gradient: linear-gradient(45deg, #a855f7, #3b82f6);
+  --cyber-gradient-reverse: linear-gradient(45deg, #3b82f6, #a855f7);
+}
+
+/* ===== Global Cyberpunk Styles ===== */
+.cyber-bg {
+  background: var(--cyber-bg-dark);
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+
+.cyber-bg::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background:
+    radial-gradient(ellipse at 20% 80%, rgba(168, 85, 247, 0.1) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 20%, rgba(59, 130, 246, 0.1) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+/* ===== Scanline Overlay ===== */
+.scanlines {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 9999;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.03),
+    rgba(0, 0, 0, 0.03) 1px,
+    transparent 1px,
+    transparent 2px
+  );
+  animation: scanlines 0.1s linear infinite;
+}
+
+@keyframes scanlines {
+  0% { background-position: 0 0; }
+  100% { background-position: 0 4px; }
+}
+
+/* ===== Glitch Text Effect ===== */
+.glitch {
+  position: relative;
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.glitch::before,
+.glitch::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+}
+
+.glitch:hover::before {
+  animation: glitch-1 0.3s linear infinite;
+  color: var(--cyber-purple);
+  opacity: 0.8;
+}
+
+.glitch:hover::after {
+  animation: glitch-2 0.3s linear infinite;
+  color: var(--cyber-blue);
+  opacity: 0.8;
+}
+
+@keyframes glitch-1 {
+  0%, 100% { transform: translate(0); }
+  20% { transform: translate(-2px, 2px); }
+  40% { transform: translate(-2px, -2px); }
+  60% { transform: translate(2px, 2px); }
+  80% { transform: translate(2px, -2px); }
+}
+
+@keyframes glitch-2 {
+  0%, 100% { transform: translate(0); }
+  20% { transform: translate(2px, -2px); }
+  40% { transform: translate(2px, 2px); }
+  60% { transform: translate(-2px, -2px); }
+  80% { transform: translate(-2px, 2px); }
+}
+
+/* ===== Neon Glow Button ===== */
+.cyber-button {
+  position: relative;
+  padding: 1rem 2rem;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--cyber-text);
+  background: linear-gradient(45deg, rgba(168, 85, 247, 0.2), rgba(59, 130, 246, 0.2));
+  border: 2px solid var(--cyber-purple);
+  border-radius: 8px;
+  cursor: pointer;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.cyber-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(168, 85, 247, 0.4), transparent);
+  transition: left 0.5s ease;
+}
+
+.cyber-button:hover {
+  box-shadow: var(--cyber-glow-purple);
+  transform: translateY(-2px);
+  border-color: var(--cyber-blue);
+}
+
+.cyber-button:hover::before {
+  left: 100%;
+}
+
+.cyber-button:active {
+  transform: translateY(0);
+}
+
+/* ===== Neon Card ===== */
+.cyber-card {
+  background: rgba(30, 41, 59, 0.8);
+  border: 1px solid rgba(168, 85, 247, 0.3);
+  border-radius: 16px;
+  padding: 1.5rem;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.cyber-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--cyber-gradient);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.cyber-card:hover {
+  border-color: rgba(168, 85, 247, 0.6);
+  box-shadow: var(--cyber-glow-purple);
+  transform: translateY(-4px);
+}
+
+.cyber-card:hover::before {
+  opacity: 1;
+}
+
+/* ===== XP Progress Bar ===== */
+.xp-bar-container {
+  width: 100%;
+  max-width: 300px;
+  padding: 0.5rem;
+  background: rgba(15, 23, 42, 0.9);
+  border: 1px solid rgba(168, 85, 247, 0.3);
+  border-radius: 12px;
+}
+
+.xp-bar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.75rem;
+  color: var(--cyber-text-muted);
+}
+
+.xp-bar-level {
+  color: var(--cyber-purple);
+  font-weight: 700;
+}
+
+.xp-bar-track {
+  height: 8px;
+  background: rgba(30, 41, 59, 0.8);
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+}
+
+.xp-bar-fill {
+  height: 100%;
+  background: var(--cyber-gradient);
+  border-radius: 4px;
+  transition: width 0.5s ease;
+  position: relative;
+}
+
+.xp-bar-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+  animation: xp-shimmer 2s infinite;
+}
+
+@keyframes xp-shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* ===== XP Gain Notification ===== */
+.xp-notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  padding: 1rem 1.5rem;
+  background: rgba(168, 85, 247, 0.9);
+  border: 1px solid var(--cyber-purple);
+  border-radius: 8px;
+  color: white;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.9rem;
+  box-shadow: var(--cyber-glow-purple);
+  animation: xp-pop 0.5s ease, xp-fade 0.5s ease 2s forwards;
+  z-index: 10000;
+}
+
+@keyframes xp-pop {
+  0% { transform: translateX(100px) scale(0.5); opacity: 0; }
+  50% { transform: translateX(-10px) scale(1.1); }
+  100% { transform: translateX(0) scale(1); opacity: 1; }
+}
+
+@keyframes xp-fade {
+  to { transform: translateX(100px); opacity: 0; }
+}
+
+/* ===== Floating Particles ===== */
+.particles {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: var(--cyber-purple);
+  border-radius: 50%;
+  opacity: 0.6;
+  animation: particle-float 15s infinite;
+}
+
+.particle:nth-child(2n) {
+  background: var(--cyber-blue);
+  animation-delay: -5s;
+}
+
+.particle:nth-child(3n) {
+  width: 2px;
+  height: 2px;
+  animation-delay: -10s;
+}
+
+@keyframes particle-float {
+  0%, 100% {
+    transform: translateY(100vh) translateX(0);
+    opacity: 0;
+  }
+  10% { opacity: 0.6; }
+  90% { opacity: 0.6; }
+  100% {
+    transform: translateY(-100vh) translateX(100px);
+    opacity: 0;
+  }
+}
+
+/* ===== Animated Border ===== */
+.animated-border {
+  position: relative;
+  background: var(--cyber-bg-medium);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.animated-border::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: conic-gradient(from 0deg, var(--cyber-purple), var(--cyber-blue), var(--cyber-purple));
+  border-radius: 18px;
+  z-index: -1;
+  animation: border-rotate 3s linear infinite;
+}
+
+@keyframes border-rotate {
+  100% { transform: rotate(360deg); }
+}
+
+/* ===== Typewriter Effect ===== */
+.typewriter {
+  overflow: hidden;
+  border-right: 2px solid var(--cyber-purple);
+  white-space: nowrap;
+  animation: typing 3s steps(30) 1s forwards, blink 0.75s step-end infinite;
+}
+
+@keyframes typing {
+  from { width: 0; }
+  to { width: 100%; }
+}
+
+@keyframes blink {
+  50% { border-color: transparent; }
+}
+
+/* ===== Neon Text ===== */
+.neon-text {
+  color: var(--cyber-text);
+  text-shadow:
+    0 0 5px var(--cyber-purple),
+    0 0 10px var(--cyber-purple),
+    0 0 20px var(--cyber-purple);
+}
+
+.neon-text-blue {
+  text-shadow:
+    0 0 5px var(--cyber-blue),
+    0 0 10px var(--cyber-blue),
+    0 0 20px var(--cyber-blue);
+}
+
+/* ===== Pulse Animation ===== */
+.pulse {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+/* ===== Hover Lift ===== */
+.hover-lift {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-8px);
+  box-shadow: var(--cyber-glow-purple);
+}
+
+/* ===== Level Badge ===== */
+.level-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: linear-gradient(45deg, rgba(168, 85, 247, 0.2), rgba(59, 130, 246, 0.2));
+  border: 1px solid var(--cyber-purple);
+  border-radius: 20px;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.8rem;
+  color: var(--cyber-purple);
+}
+
+/* ===== Selection Cards ===== */
+.selection-card {
+  background: rgba(30, 41, 59, 0.6);
+  border: 2px solid transparent;
+  border-radius: 16px;
+  padding: 2rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.selection-card:hover {
+  border-color: rgba(168, 85, 247, 0.5);
+  background: rgba(30, 41, 59, 0.8);
+  transform: scale(1.02);
+}
+
+.selection-card.selected {
+  border-color: var(--cyber-purple);
+  box-shadow: var(--cyber-glow-purple);
+  background: rgba(168, 85, 247, 0.1);
+}
+
+.selection-card.selected::after {
+  content: '';
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 24px;
+  height: 24px;
+  background: var(--cyber-gradient);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ===== Input Styles ===== */
+.cyber-input {
+  width: 100%;
+  padding: 1rem;
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid rgba(168, 85, 247, 0.3);
+  border-radius: 8px;
+  color: var(--cyber-text);
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.cyber-input:focus {
+  outline: none;
+  border-color: var(--cyber-purple);
+  box-shadow: 0 0 10px rgba(168, 85, 247, 0.3);
+}
+
+.cyber-input::placeholder {
+  color: var(--cyber-text-dim);
+}
+
+/* ===== Sound Toggle ===== */
+.sound-toggle {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 50px;
+  height: 50px;
+  background: rgba(30, 41, 59, 0.9);
+  border: 1px solid var(--cyber-purple);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 1000;
+}
+
+.sound-toggle:hover {
+  box-shadow: var(--cyber-glow-purple);
+  transform: scale(1.1);
+}
+
+.sound-toggle svg {
+  color: var(--cyber-purple);
+  width: 24px;
+  height: 24px;
+}
+
+/* ===== Achievement Popup ===== */
+.achievement-popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  padding: 2rem 3rem;
+  background: rgba(15, 23, 42, 0.95);
+  border: 2px solid var(--cyber-purple);
+  border-radius: 20px;
+  text-align: center;
+  z-index: 10001;
+  animation: achievement-show 0.5s ease forwards;
+}
+
+@keyframes achievement-show {
+  0% { transform: translate(-50%, -50%) scale(0); }
+  50% { transform: translate(-50%, -50%) scale(1.1); }
+  100% { transform: translate(-50%, -50%) scale(1); }
+}
+
+.achievement-popup h3 {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1.5rem;
+  color: var(--cyber-purple);
+  margin-bottom: 0.5rem;
+}
+
+.achievement-popup p {
+  color: var(--cyber-text-muted);
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 768px) {
+  .cyber-button {
+    padding: 0.75rem 1.5rem;
+    font-size: 0.9rem;
+  }
+
+  .cyber-card {
+    padding: 1rem;
+  }
+
+  .xp-bar-container {
+    max-width: 100%;
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls -la \"c:\\\\Users\\\\shree\\\\OneDrive\\\\Desktop\\\\Moodify\\\\src\"\" 2>/dev/null || find \"c:UsersshreeOneDriveDesktopMoodifysrc \" -maxdepth 2 -type f)"
+    ]
+  }
+}

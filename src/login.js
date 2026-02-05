@@ -1,180 +1,412 @@
-
-
-//login frontend
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import Particles from './components/Particles';
+import SoundToggle from './components/SoundToggle';
+import soundManager from './utils/sounds';
+import { useGameState } from './hooks/useGameState';
+import XPNotification from './components/XPNotification';
+import './styles/cyberpunk.css';
 
 function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const navigate = useNavigate();
+  const { addXP, notification, levelUp } = useGameState();
 
-  const handleLogin = (event) => {
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const handleLogin = async (event) => {
     event.preventDefault();
+    setIsLoading(true);
+    soundManager.playClick();
 
-    
-    if (email === 'shib@gmail.com' && password === 'hihi') {
-      const user = { email, username: 'shib' };
-      localStorage.setItem('user', JSON.stringify(user));
-      localStorage.setItem('token', 'example-token'); 
-      navigate('/dashboard');
-    }
+    try {
+      const response = await fetch('http://localhost:5000/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
 
-    if (email === 'sham@gmail.com' && password === 'hihi') {
-      const user = { email, username: 'shambhavi' };
-      localStorage.setItem('user', JSON.stringify(user));
-      localStorage.setItem('token', 'example-token'); 
-      navigate('/dashboard');
-    }
-    
-    if (email === 'shwetha@gmail.com' && password === '1234') {
-      const user = { email, username: 'shwetha' };
-      localStorage.setItem('user', JSON.stringify(user));
-      localStorage.setItem('token', 'example-token'); 
-      navigate('/dashboard');
-    }
-     
-      
-    else {
-      setMessage('Invalid email or password');
+      const data = await response.json();
+
+      if (response.ok) {
+        localStorage.setItem('user', JSON.stringify(data.user));
+        localStorage.setItem('token', data.token);
+        soundManager.playSuccess();
+        addXP('LOGIN');
+        setTimeout(() => navigate('/dashboard'), 500);
+      } else {
+        soundManager.playError();
+        setMessage(data.message || 'Invalid email or password');
+        setIsLoading(false);
+      }
+    } catch (error) {
+      soundManager.playError();
+      setMessage('Server error. Please try again.');
+      setIsLoading(false);
     }
   };
-
-  const styles = {
-    loginPage: {
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      height: '100vh',
-      backgroundColor: '#0f172a', // Dark blue background
-    },
-    loginContainer: {
-      width: '100%',
-      maxWidth: '400px',
-      padding: '2rem',
-      backgroundColor: '#1e293b', // Slightly lighter dark background
-      borderRadius: '10px',
-      boxShadow: '0 0 20px rgba(168, 85, 247, 0.4)', // Purple glow
-      textAlign: 'center',
-    },
-    heading: {
-      marginBottom: '1.5rem',
-      color: '#a855f7', // Bright purple
-      fontSize: '1.5rem',
-      fontWeight: 'bold',
-    },
-    inputGroup: {
-      marginBottom: '1rem',
-      textAlign: 'left',
-    },
-    label: {
-      display: 'block',
-      marginBottom: '0.5rem',
-      color: '#9ca3af', // Neutral gray
-      fontSize: '0.9rem',
-    },
-    input: {
-      width: '100%',
-      padding: '0.75rem',
-      backgroundColor: '#1f2937', // Dark input field
-      border: '1px solid #334155',
-      borderRadius: '5px',
-      color: 'white',
-      fontSize: '1rem',
-      outline: 'none',
-      transition: 'border-color 0.3s ease',
-    },
-    inputFocus: {
-      borderColor: '#a855f7', // Purple border on focus
-    },
-    message: {
-      marginBottom: '1rem',
-      color: '#f87171', // Red for error messages
-      fontSize: '0.9rem',
-    },
-    loginButton: {
-      width: '100%',
-      padding: '1rem',
-      border: 'none',
-      borderRadius: '10px',
-      background: 'linear-gradient(45deg, #a855f7, #3b82f6)', // Gradient for the button
-      color: 'white',
-      fontSize: '1.1rem',
-      cursor: 'pointer',
-      transition: 'all 0.3s ease',
-      boxShadow: '0 4px 6px rgba(0, 0, 0, 0.3)', // Subtle shadow
-    },
-    loginButtonHover: {
-      transform: 'translateY(-2px)',
-      boxShadow: '0 0 20px rgba(168, 85, 247, 0.4)', // Purple glow on hover
-    },
-    signupLink: {
-      marginTop: '1rem',
-      color: '#cbd5e1', // Neutral gray
-      fontSize: '0.9rem',
-    },
-    link: {
-      color: '#a855f7', // Purple link
-      textDecoration: 'none',
-      transition: 'color 0.3s ease',
-    },
-    linkHover: {
-      color: '#3b82f6', // Bright blue on hover
-    },
-  };
-  
 
   return (
-    <div style={styles.loginPage}>
-      <div style={styles.loginContainer}>
-        <h2 style={styles.heading}>Welcome Back</h2>
-        <form onSubmit={handleLogin}>
+    <div style={styles.container}>
+      <Particles count={20} />
+      <div style={styles.scanlines} />
+
+      {/* Gradient Orbs */}
+      <div style={styles.gradientOrb1} />
+      <div style={styles.gradientOrb2} />
+
+      {/* Corner Decorations */}
+      <div style={styles.cornerTL} />
+      <div style={styles.cornerBR} />
+
+      {/* Login Card */}
+      <div style={{
+        ...styles.card,
+        opacity: mounted ? 1 : 0,
+        transform: mounted ? 'translateY(0)' : 'translateY(20px)'
+      }}>
+        {/* Header */}
+        <div style={styles.header}>
+          <div style={styles.headerLine} />
+          <h2 style={styles.title}>
+            <span style={styles.titleBracket}>[</span>
+            ACCESS TERMINAL
+            <span style={styles.titleBracket}>]</span>
+          </h2>
+          <div style={styles.headerLine} />
+        </div>
+
+        <p style={styles.subtitle}>ENTER CREDENTIALS TO CONTINUE</p>
+
+        <form onSubmit={handleLogin} style={styles.form}>
           <div style={styles.inputGroup}>
-            <label htmlFor="email" style={styles.label}>
-              Email
+            <label style={styles.label}>
+              <span style={styles.labelIcon}>▸</span> EMAIL
             </label>
             <input
               type="email"
-              id="email"
               style={styles.input}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              onFocus={(e) => {
+                e.target.style.borderColor = '#a855f7';
+                e.target.style.boxShadow = '0 0 15px rgba(168, 85, 247, 0.3)';
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = 'rgba(168, 85, 247, 0.3)';
+                e.target.style.boxShadow = 'none';
+              }}
+              placeholder="user@example.com"
               required
             />
           </div>
+
           <div style={styles.inputGroup}>
-            <label htmlFor="password" style={styles.label}>
-              Password
+            <label style={styles.label}>
+              <span style={styles.labelIcon}>▸</span> PASSWORD
             </label>
             <input
               type="password"
-              id="password"
               style={styles.input}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              onFocus={(e) => {
+                e.target.style.borderColor = '#a855f7';
+                e.target.style.boxShadow = '0 0 15px rgba(168, 85, 247, 0.3)';
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = 'rgba(168, 85, 247, 0.3)';
+                e.target.style.boxShadow = 'none';
+              }}
+              placeholder="••••••••"
               required
             />
           </div>
-          {message && <div style={styles.message}>{message}</div>}
+
+          {message && (
+            <div style={styles.message}>
+              <span style={styles.messageIcon}>⚠</span> {message}
+            </div>
+          )}
+
           <button
             type="submit"
-            style={styles.loginButton}
-            onMouseEnter={(e) => Object.assign(e.target.style, styles.loginButtonHover)}
+            style={{
+              ...styles.button,
+              opacity: isLoading ? 0.7 : 1,
+            }}
+            disabled={isLoading}
+            onMouseEnter={(e) => {
+              if (!isLoading) {
+                soundManager.playHover();
+                e.target.style.boxShadow = '0 0 30px rgba(168, 85, 247, 0.5)';
+                e.target.style.transform = 'translateY(-2px)';
+              }
+            }}
             onMouseLeave={(e) => {
-              e.target.style.transform = '';
-              e.target.style.boxShadow = '';
+              e.target.style.boxShadow = 'none';
+              e.target.style.transform = 'translateY(0)';
             }}
           >
-            Login
+            {isLoading ? (
+              <span style={styles.loadingText}>AUTHENTICATING...</span>
+            ) : (
+              <>
+                <span>LOGIN</span>
+                <span style={styles.buttonArrow}>→</span>
+              </>
+            )}
           </button>
         </form>
-        <div style={styles.signupLink}>
-          Don't have an account? <Link to="/signup">Sign up</Link>
+
+        <div style={styles.footer}>
+          <span style={styles.footerText}>NEW USER?</span>
+          <Link
+            to="/signup"
+            style={styles.link}
+            onMouseEnter={() => soundManager.playHover()}
+          >
+            CREATE ACCOUNT
+          </Link>
         </div>
+
+        {/* Decorative Elements */}
+        <div style={styles.cardCornerTL} />
+        <div style={styles.cardCornerBR} />
       </div>
+
+      <SoundToggle />
+      <XPNotification notification={notification} levelUp={levelUp} />
     </div>
   );
 }
+
+const styles = {
+  container: {
+    minHeight: '100vh',
+    background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%)',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'relative',
+    overflow: 'hidden',
+    fontFamily: "'Orbitron', sans-serif",
+  },
+  scanlines: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    background: 'repeating-linear-gradient(0deg, rgba(0,0,0,0.03), rgba(0,0,0,0.03) 1px, transparent 1px, transparent 2px)',
+    pointerEvents: 'none',
+    zIndex: 10,
+  },
+  gradientOrb1: {
+    position: 'absolute',
+    top: '20%',
+    left: '10%',
+    width: '300px',
+    height: '300px',
+    background: 'radial-gradient(circle, rgba(168, 85, 247, 0.1) 0%, transparent 70%)',
+    borderRadius: '50%',
+    filter: 'blur(60px)',
+    pointerEvents: 'none',
+  },
+  gradientOrb2: {
+    position: 'absolute',
+    bottom: '20%',
+    right: '10%',
+    width: '400px',
+    height: '400px',
+    background: 'radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%)',
+    borderRadius: '50%',
+    filter: 'blur(60px)',
+    pointerEvents: 'none',
+  },
+  cornerTL: {
+    position: 'absolute',
+    top: '20px',
+    left: '20px',
+    width: '60px',
+    height: '60px',
+    borderTop: '2px solid rgba(168, 85, 247, 0.5)',
+    borderLeft: '2px solid rgba(168, 85, 247, 0.5)',
+  },
+  cornerBR: {
+    position: 'absolute',
+    bottom: '20px',
+    right: '20px',
+    width: '60px',
+    height: '60px',
+    borderBottom: '2px solid rgba(59, 130, 246, 0.5)',
+    borderRight: '2px solid rgba(59, 130, 246, 0.5)',
+  },
+  card: {
+    width: '100%',
+    maxWidth: '420px',
+    padding: '2.5rem',
+    background: 'rgba(15, 23, 42, 0.9)',
+    borderRadius: '16px',
+    border: '1px solid rgba(168, 85, 247, 0.3)',
+    backdropFilter: 'blur(20px)',
+    position: 'relative',
+    zIndex: 5,
+    transition: 'all 0.5s ease',
+  },
+  header: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '1rem',
+    marginBottom: '0.5rem',
+  },
+  headerLine: {
+    flex: 1,
+    height: '1px',
+    background: 'linear-gradient(90deg, transparent, rgba(168, 85, 247, 0.5), transparent)',
+  },
+  title: {
+    fontSize: '1.1rem',
+    fontWeight: '700',
+    color: '#a855f7',
+    textAlign: 'center',
+    letterSpacing: '0.1em',
+    whiteSpace: 'nowrap',
+  },
+  titleBracket: {
+    color: '#3b82f6',
+    fontWeight: '300',
+  },
+  subtitle: {
+    textAlign: 'center',
+    fontSize: '0.7rem',
+    color: '#64748b',
+    letterSpacing: '0.2em',
+    marginBottom: '2rem',
+  },
+  form: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '1.5rem',
+  },
+  inputGroup: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '0.5rem',
+  },
+  label: {
+    fontSize: '0.75rem',
+    color: '#94a3b8',
+    letterSpacing: '0.1em',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.5rem',
+  },
+  labelIcon: {
+    color: '#a855f7',
+    fontSize: '0.6rem',
+  },
+  input: {
+    width: '100%',
+    padding: '1rem',
+    background: 'rgba(30, 41, 59, 0.8)',
+    border: '1px solid rgba(168, 85, 247, 0.3)',
+    borderRadius: '8px',
+    color: 'white',
+    fontSize: '1rem',
+    fontFamily: 'inherit',
+    transition: 'all 0.3s ease',
+    outline: 'none',
+  },
+  message: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.5rem',
+    padding: '0.75rem 1rem',
+    background: 'rgba(239, 68, 68, 0.1)',
+    border: '1px solid rgba(239, 68, 68, 0.3)',
+    borderRadius: '8px',
+    color: '#f87171',
+    fontSize: '0.85rem',
+  },
+  messageIcon: {
+    fontSize: '1rem',
+  },
+  button: {
+    width: '100%',
+    padding: '1rem',
+    background: 'linear-gradient(135deg, rgba(168, 85, 247, 0.2) 0%, rgba(59, 130, 246, 0.2) 100%)',
+    border: '2px solid #a855f7',
+    borderRadius: '8px',
+    color: 'white',
+    fontSize: '1rem',
+    fontWeight: '600',
+    fontFamily: "'Orbitron', sans-serif",
+    letterSpacing: '0.15em',
+    cursor: 'pointer',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: '0.75rem',
+    transition: 'all 0.3s ease',
+    marginTop: '0.5rem',
+  },
+  buttonArrow: {
+    transition: 'transform 0.3s ease',
+  },
+  loadingText: {
+    animation: 'pulse 1s ease-in-out infinite',
+  },
+  footer: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: '0.75rem',
+    marginTop: '2rem',
+    paddingTop: '1.5rem',
+    borderTop: '1px solid rgba(168, 85, 247, 0.2)',
+  },
+  footerText: {
+    fontSize: '0.75rem',
+    color: '#64748b',
+    letterSpacing: '0.1em',
+  },
+  link: {
+    fontSize: '0.75rem',
+    color: '#a855f7',
+    textDecoration: 'none',
+    letterSpacing: '0.1em',
+    fontWeight: '600',
+    transition: 'color 0.3s ease',
+  },
+  cardCornerTL: {
+    position: 'absolute',
+    top: '-1px',
+    left: '-1px',
+    width: '20px',
+    height: '20px',
+    borderTop: '2px solid #a855f7',
+    borderLeft: '2px solid #a855f7',
+    borderTopLeftRadius: '16px',
+  },
+  cardCornerBR: {
+    position: 'absolute',
+    bottom: '-1px',
+    right: '-1px',
+    width: '20px',
+    height: '20px',
+    borderBottom: '2px solid #3b82f6',
+    borderRight: '2px solid #3b82f6',
+    borderBottomRightRadius: '16px',
+  },
+};
 
 export default Login;
