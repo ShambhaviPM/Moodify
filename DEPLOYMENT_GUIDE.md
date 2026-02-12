@@ -16,9 +16,9 @@ This guide will help you deploy both the frontend and backend of Moodify to Verc
 
 1. Go to [MongoDB Atlas](https://www.mongodb.com/atlas) and create a free cluster
 2. Click "Connect" → "Connect your application"
-3. Copy the connection string (looks like: `mongodb+srv://username:password@cluster.mongodb.net/`)
-4. Replace `<password>` with your actual database password
-5. Add `/moodify` at the end: `mongodb+srv://username:password@cluster.mongodb.net/moodify`
+3. Copy the connection string (it will look like: `mongodb+srv://<user>:<pass>@<cluster>.mongodb.net/`)
+4. Replace `<pass>` with your actual database password
+5. Add `/moodify` at the end of the connection string
 
 ### Step 2: Deploy Backend to Vercel
 
@@ -55,9 +55,9 @@ This guide will help you deploy both the frontend and backend of Moodify to Verc
    - Settings → Environment Variables
    - Add these variables:
      ```
-     MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/moodify
-     JWT_SECRET=your_secure_random_string_here
-     FRONTEND_URL=https://your-frontend-url.vercel.app
+     MONGODB_URI=<your-atlas-connection-string>
+     JWT_SECRET=<generate-a-secure-random-string>
+     FRONTEND_URL=<your-frontend-vercel-url>
      NODE_ENV=production
      PORT=5000
      ```
