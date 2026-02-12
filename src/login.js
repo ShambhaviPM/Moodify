@@ -5,6 +5,7 @@ import SoundToggle from './components/SoundToggle';
 import soundManager from './utils/sounds';
 import { useGameState } from './hooks/useGameState';
 import XPNotification from './components/XPNotification';
+import { API_BASE_URL } from './config';
 import './styles/cyberpunk.css';
 
 function Login() {
@@ -14,7 +15,7 @@ function Login() {
   const [isLoading, setIsLoading] = useState(false);
   const [mounted, setMounted] = useState(false);
   const navigate = useNavigate();
-  const { addXP, notification, levelUp } = useGameState();
+  const { notification, levelUp } = useGameState();
 
   useEffect(() => {
     setMounted(true);
@@ -26,7 +27,7 @@ function Login() {
     soundManager.playClick();
 
     try {
-      const response = await fetch('http://localhost:5000/api/auth/login', {
+      const response = await fetch(`${API_BASE_URL}/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -40,7 +41,6 @@ function Login() {
         localStorage.setItem('user', JSON.stringify(data.user));
         localStorage.setItem('token', data.token);
         soundManager.playSuccess();
-        addXP('LOGIN');
         setTimeout(() => navigate('/dashboard'), 500);
       } else {
         soundManager.playError();

@@ -3,55 +3,143 @@ import { useNavigate, Link } from 'react-router-dom';
 import RecommendationData from './recommendation-data';
 import Particles from './components/Particles';
 import SoundToggle from './components/SoundToggle';
-import XPNotification from './components/XPNotification';
-import { useGameState } from './hooks/useGameState';
 import soundManager from './utils/sounds';
+import { API_BASE_URL } from './config';
 import './styles/cyberpunk.css';
 
 const RecommendationsPage = () => {
   const navigate = useNavigate();
   const [recommendations, setRecommendations] = useState([]);
   const [mounted, setMounted] = useState(false);
-  const [xpAdded, setXpAdded] = useState(false);
-  const { addXP, notification, levelUp } = useGameState();
+  const [feedback, setFeedback] = useState({}); // Track feedback per recommendation
+  const [interactionIds, setInteractionIds] = useState({});
+
+  const trackInteraction = async (recommendationId, recommendationTitle) => {
+    try {
+      const mood = localStorage.getItem('selectedMood');
+      const activity = localStorage.getItem('selectedActivity');
+      const theme = localStorage.getItem('currentTheme');
+      const token = localStorage.getItem('token');
+
+      if (!token) return;
+
+      const response = await fetch(`${API_BASE_URL}/interactions/track`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          mood,
+          activity,
+          theme,
+          recommendationId,
+          clicked: true,
+          timeSpent: 0
+        })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setInteractionIds(prev => ({
+          ...prev,
+          [recommendationId]: data.interactionId
+        }));
+      }
+    } catch (error) {
+      console.error('Error tracking interaction:', error);
+    }
+  };
+
+  const submitFeedback = async (recommendationId, feedbackValue) => {
+    try {
+      const token = localStorage.getItem('token');
+      const interactionId = interactionIds[recommendationId];
+
+      if (!token || !interactionId) return;
+
+      await fetch(`${API_BASE_URL}/interactions/feedback`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          interactionId,
+          feedback: feedbackValue
+        })
+      });
+
+      setFeedback(prev => ({
+        ...prev,
+        [recommendationId]: feedbackValue
+      }));
+    } catch (error) {
+      console.error('Error submitting feedback:', error);
+    }
+  };
 
   useEffect(() => {
     setMounted(true);
     const mood = localStorage.getItem('selectedMood');
     const activity = localStorage.getItem('selectedActivity');
     const theme = localStorage.getItem('currentTheme');
+    const token = localStorage.getItem('token');
 
-    const generateRecommendations = () => {
-      const allContent = RecommendationData.contentSections;
-      const moodProfile = RecommendationData.recommendationMatrix.mood[mood];
-      const themeRecommendations = RecommendationData.recommendationMatrix.theme[theme];
-
-      const filteredRecommendations = allContent
-        .filter(section =>
-          themeRecommendations?.includes(section.id) ||
-          section.tags?.some(tag => moodProfile?.preference?.includes(tag))
-        )
-        .slice(0, 3);
-
-      return filteredRecommendations;
-    };
-
-    const generatedRecs = generateRecommendations();
+    const energy = localStorage.getItem('energyLevel');
+    // Use the 4-tier filtering: activity -> theme -> energy -> mood scoring
+    const generatedRecs = RecommendationData.findRecommendations(mood, activity, theme, energy, 3);
     setRecommendations(generatedRecs);
 
-    // Add XP for viewing recommendations (only once)
-    if (!xpAdded) {
-      setTimeout(() => {
-        addXP('VIEW_RECOMMENDATION');
-        setXpAdded(true);
-      }, 500);
+    // Track that user viewed recommendations
+    generatedRecs.forEach(rec => {
+      trackInteraction(rec.id, rec.title);
+    });
+
+    // Try ML enhancement: if user has history, the ML engine may suggest
+    // a better #1 pick based on their liked items
+    if (token && mood && activity && theme) {
+      fetch(`${API_BASE_URL}/recommendations/ml`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ mood, activity, theme })
+      })
+        .then(res => res.ok ? res.json() : null)
+        .then(data => {
+          if (data?.success && data.isML && data.recommendation) {
+            const mlId = data.recommendation.id;
+            // Find the full content item from local data (ML only sends id/title)
+            const fullItem = RecommendationData.contentSections.find(c => c.id === mlId);
+            if (fullItem) {
+              setRecommendations(prev => {
+                const alreadyIn = prev.find(r => r.id === mlId);
+                if (alreadyIn) {
+                  // Boost it to position #1
+                  return [alreadyIn, ...prev.filter(r => r.id !== mlId)];
+                }
+                // Swap it in for the last item
+                return [fullItem, ...prev.slice(0, 2)];
+              });
+            }
+          }
+        })
+        .catch(() => { /* ML is optional, local recs are the fallback */ });
     }
-  }, [addXP, xpAdded]);
+
+  }, []);
 
   const handleSelectRecommendation = (recommendation) => {
     soundManager.playSelect();
     localStorage.setItem('selectedRecommendation', JSON.stringify(recommendation));
-    navigate('/results');
+    // If it's an in-app experience, go directly there
+    if (recommendation.inApp) {
+      navigate(recommendation.inApp.route);
+    } else {
+      navigate('/results');
+    }
   };
 
   return (
@@ -64,7 +152,7 @@ const RecommendationsPage = () => {
       {/* Header */}
       <div style={styles.header}>
         <Link
-          to="/theme"
+          to="/energy"
           style={styles.backButton}
           onMouseEnter={(e) => {
             soundManager.playHover();
@@ -104,7 +192,6 @@ const RecommendationsPage = () => {
                 ...styles.card,
                 animationDelay: `${index * 0.1}s`,
               }}
-              onClick={() => handleSelectRecommendation(rec)}
               onMouseEnter={(e) => {
                 soundManager.playHover();
                 e.currentTarget.style.borderColor = '#a855f7';
@@ -128,8 +215,56 @@ const RecommendationsPage = () => {
               <div style={styles.cardContent}>
                 <h2 style={styles.cardTitle}>{rec.title}</h2>
                 <p style={styles.cardDescription}>{rec.description}</p>
+                
+                {/* Feedback Buttons */}
+                <div style={styles.feedbackContainer}>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      soundManager.playSelect();
+                      submitFeedback(rec.id, 'liked');
+                    }}
+                    style={{
+                      ...styles.feedbackButton,
+                      opacity: feedback[rec.id] === 'liked' ? 1 : 0.6,
+                      borderColor: feedback[rec.id] === 'liked' ? '#10b981' : 'rgba(16, 185, 129, 0.3)',
+                      color: feedback[rec.id] === 'liked' ? '#10b981' : 'rgba(16, 185, 129, 0.7)',
+                    }}
+                    title="I like this recommendation"
+                  >
+                    👍
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      soundManager.playSelect();
+                      submitFeedback(rec.id, 'disliked');
+                    }}
+                    style={{
+                      ...styles.feedbackButton,
+                      opacity: feedback[rec.id] === 'disliked' ? 1 : 0.6,
+                      borderColor: feedback[rec.id] === 'disliked' ? '#ef4444' : 'rgba(239, 68, 68, 0.3)',
+                      color: feedback[rec.id] === 'disliked' ? '#ef4444' : 'rgba(239, 68, 68, 0.7)',
+                    }}
+                    title="Not what I'm looking for"
+                  >
+                    👎
+                  </button>
+                </div>
+
                 <div style={styles.cardFooter}>
-                  <span style={styles.exploreText}>EXPLORE →</span>
+                  <button
+                    onClick={() => handleSelectRecommendation(rec)}
+                    style={styles.exploreButton}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.color = '#a855f7';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.color = 'rgba(168, 85, 247, 0.7)';
+                    }}
+                  >
+                    EXPLORE →
+                  </button>
                 </div>
               </div>
             </div>
@@ -145,7 +280,6 @@ const RecommendationsPage = () => {
       </main>
 
       <SoundToggle />
-      <XPNotification notification={notification} levelUp={levelUp} />
     </div>
   );
 };
@@ -303,14 +437,34 @@ const styles = {
     fontFamily: 'system-ui, sans-serif',
     marginBottom: '1rem',
   },
+  feedbackContainer: {
+    display: 'flex',
+    gap: '0.75rem',
+    justifyContent: 'center',
+    marginBottom: '1rem',
+  },
+  feedbackButton: {
+    background: 'transparent',
+    border: '1px solid rgba(168, 85, 247, 0.3)',
+    borderRadius: '6px',
+    padding: '0.5rem 0.75rem',
+    fontSize: '1.2rem',
+    cursor: 'pointer',
+    transition: 'all 0.3s ease',
+  },
   cardFooter: {
     display: 'flex',
     justifyContent: 'flex-end',
   },
-  exploreText: {
+  exploreButton: {
+    background: 'transparent',
+    border: 'none',
     fontSize: '0.75rem',
-    color: '#3b82f6',
+    color: 'rgba(168, 85, 247, 0.7)',
     letterSpacing: '0.1em',
+    cursor: 'pointer',
+    transition: 'color 0.3s ease',
+    fontFamily: "'Orbitron', sans-serif",
   },
   emptyState: {
     padding: '3rem',

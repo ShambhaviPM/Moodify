@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import Particles from './components/Particles';
 import SoundToggle from './components/SoundToggle';
 import soundManager from './utils/sounds';
+import { API_BASE_URL } from './config';
 import './styles/cyberpunk.css';
 
 const Signup = () => {
@@ -34,7 +35,7 @@ const Signup = () => {
     }
 
     try {
-      const response = await fetch('http://localhost:5000/api/auth/signup', {
+      const response = await fetch(`${API_BASE_URL}/auth/signup`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
